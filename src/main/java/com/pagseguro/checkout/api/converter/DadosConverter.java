@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.pagseguro.checkout.api.model.input.PagamentoModel;
@@ -20,6 +21,7 @@ import com.pagseguro.checkout.domain.model.dto.RemessaDTO;
 import com.pagseguro.checkout.domain.model.dto.RemetenteDTO;
 import com.pagseguro.checkout.domain.model.dto.TelefoneDTO;
 import com.pagseguro.checkout.domain.model.dto.TitularDTO;
+import com.pagseguro.checkout.domain.repository.ProdutoRepository;
 
 import br.com.uol.pagseguro.api.common.domain.ShippingType;
 import br.com.uol.pagseguro.api.common.domain.enums.Currency;
@@ -29,6 +31,9 @@ import br.com.uol.pagseguro.api.common.domain.enums.State;
 @Component
 public class DadosConverter {
 	
+	@Autowired
+	private ProdutoRepository produtoRepository;
+	
 	public PagamentoDTO converter(PagamentoModel pagamentoModel) {
 			
 		PagamentoDTO pagamentoDTO = GerarBuilds(pagamentoModel);
@@ -36,7 +41,6 @@ public class DadosConverter {
 		return pagamentoDTO;
 
 	}
-	
 
 	private PagamentoDTO GerarBuilds(PagamentoModel pagamentoModel) {
 		
@@ -65,13 +69,8 @@ public class DadosConverter {
 			 throw new NegocioException("Erro ao converter data de nascimento!", e);
 		}
 			
-		ProdutoDTO produtoDTO = ProdutoDTO.builder()
-				.id(1L)
-				.descricao("mouse")
-				.peso(1)
-				.preco(new BigDecimal("100.00"))
-				.quantidade(1)
-				.build();
+		
+		ProdutoDTO produtoDTO = produtoRepository.buscarPorId(pagamentoModel.getProdutoId());
 		
 		List<ProdutoDTO> produtos = new ArrayList<ProdutoDTO>();
 		produtos.add(produtoDTO);
@@ -102,7 +101,7 @@ public class DadosConverter {
 		
 		PrestacaoDTO prestacaoDTO = PrestacaoDTO.builder()
 				.quantidade(1)
-				.valor(new BigDecimal("110.00"))
+				.valor(produtoDTO.getPreco().add(remessaDTO.getCusto()))
 				.build();
 		
 		CartaoCreditoDTO cartaoCreditoDTO = CartaoCreditoDTO.builder()
@@ -111,7 +110,6 @@ public class DadosConverter {
 				.prestacao(prestacaoDTO)
 				.titular(titularDTO)
 				.build();
-		
 		
 		PagamentoDTO pagamentoDTO = PagamentoDTO.builder()
 				.id(pagamentoModel.getId())

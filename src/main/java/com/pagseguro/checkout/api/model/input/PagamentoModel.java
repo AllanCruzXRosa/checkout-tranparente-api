@@ -22,7 +22,11 @@ public class PagamentoModel {
 	@NotBlank
 	@ApiModelProperty(example = "100.00")
 	private  int parcelaValor;
-		
+	
+	@NotNull
+	@ApiModelProperty(example = "1")
+	private Long produtoId;
+	
 	private CartaoModel cartao;
 		
 	private CompradorModel comprador; 

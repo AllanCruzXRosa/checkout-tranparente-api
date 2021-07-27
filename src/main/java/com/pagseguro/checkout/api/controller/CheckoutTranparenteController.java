@@ -45,6 +45,7 @@ public class CheckoutTranparenteController {
 	@Autowired
 	private TransacaoModelAssembler transacaoModelAssembler;
 
+
 	@ApiOperation("Gera uma nova sessão")
 	@GetMapping("/transparente/session")
 	public String getSessionId() {
